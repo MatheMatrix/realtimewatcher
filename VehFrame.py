@@ -62,7 +62,7 @@ class VehFrame(wx.Frame):
                     pygame.quit()
                     self.Close(True)
 
-            ctime = clock.tick(100) 
+            ctime = clock.tick(100)
 
             # 检测有无新车辆
             newveh = self.GetVeh()

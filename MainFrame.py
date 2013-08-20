@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 
 import wx
-import AccFrame
+import AccDlg
 import VehFrame
 import CableFrame
 import StrainFrame
@@ -12,7 +12,7 @@ class MainFrame(wx.Frame):
 
     def __init__(self, parent, id):
         wx.Frame.__init__(self, parent, id, u'潮白河大桥实时监控系统', size = (1083, 720), style = wx.CAPTION)#wx.DEFAULT_FRAME_STYLE^(wx.RESIZE_BORDER | wx.MINIMIZE_BOX | wx.MAXIMIZE_BOX | wx.CLOSE_BOX))
-        
+
         panel = self.Display()
 
     def AddButton(self, bid, pngs, label, name, panel):
@@ -32,20 +32,20 @@ class MainFrame(wx.Frame):
         b.SetInitialSize()
 
         return b
-    
+
     def Display(self):
         '''Display elements on the frame
         '''
         
         panel = wx.Panel(self, -1, pos = (0, 0), style = wx.NO_FULL_REPAINT_ON_RESIZE)  # , size = (1083, 720)
-        # panel.SetBackgroundColour('white') 
+        # panel.SetBackgroundColour('white')
         
         title = self.DisplayTitle(panel)
         subtitle = self.DisplaySubtitle(panel)
         design = wx.StaticText(panel, -1, u'Design for Miyun Chaobaihe Bridge', (840, 650), (-1, -1), wx.ALIGN_RIGHT)
 
         self.buttons = self.DisplayButtons(panel)
-        
+
         return panel
     
     def DisplayTitle(self, panel):
@@ -86,24 +86,24 @@ class MainFrame(wx.Frame):
 
         self.BindButtons(buttons)
         self.Bind(wx.EVT_BUTTON, self.Exit, buttons[-1])
-        
+
     def Exit(self, event):
         '''Exit
         '''
 
-        dlg = wx.MessageDialog(None, u'确定退出么？（退出前请将所有监控模块关闭）', u'确认', wx.YES_NO | wx.ICON_EXCLAMATION)
+        dlg = wx.MessageDialog(None, u'确定退出么？（退出前请关闭所有模块）', u'确认', wx.YES_NO | wx.ICON_EXCLAMATION)
         result = dlg.ShowModal()
         dlg.Destroy()
         if result == wx.ID_YES:
-            # self.Close(True)
+            self.Close(True)
             wx.Exit()
         else:
             pass
 
     def BuildAccFrame(self, event):
         if self.framestats['Acc'] == 0:
-            accframe = AccFrame.AccFrame(parent = None, id = -1, stat = self.FrameStats)
-            accframe.Show()
+            accdlg = AccDlg.AccDlg(parent = None, id = -1, stat = self.FrameStats)
+            accdlg.Show()
             self.framestats['Acc'] = 1
         else:
             self.DontRepeat()
