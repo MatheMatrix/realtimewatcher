@@ -204,4 +204,3 @@ if __name__ == '__main__':
     app = wx.PySimpleApp()
     AccFrame(None, -1).Show()
     app.MainLoop()
-

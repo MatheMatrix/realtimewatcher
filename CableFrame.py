@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*- 
 import wx
 
+import matplotlib
+matplotlib.use('WXAgg')
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_wxagg import \
+    FigureCanvasWxAgg as FigCanvas, \
+    NavigationToolbar2WxAgg as NavigationToolbar
+import numpy as np
+
 class CableFrame(wx.Frame):
     '''docstring for CableFrame
     '''
