@@ -15,6 +15,7 @@ import socket
 
 
 class CableFrame(wx.Frame):
+
     """docstring for CableFrame
     """
 
@@ -34,7 +35,7 @@ class CableFrame(wx.Frame):
         rect.set_facecolor('#f0f0f0')
 
         self.DisplayCheckBoxes(panel)
-        self.plot = cablePlot(panel, fig)
+        self.plot = CablePlot(panel, fig)
         self.DisplayButton(panel)
 
     def DisplayCheckBoxes(self, panel):
@@ -102,9 +103,10 @@ class CableFrame(wx.Frame):
 
     def __del__(self):
         self.ChangeStat('Cable')
+        self.plot.redrawtimer.Stop()
 
 
-class cablePlot():
+class CablePlot():
 
     """Paint cable which contain Force and Temperature
     """
@@ -120,7 +122,7 @@ class cablePlot():
         self.fig = fig
         self.axes = []
 
-        self.cabledata = cableReceiveThread()
+        self.cabledata = CableReceiveThread()
         self.cabledata.start()
 
         self.DisplayBar(panel)
@@ -162,7 +164,7 @@ class cablePlot():
         self.axes[sub].bar(
             left=np.arange(len(self.data[sub])),
             height=self.data[sub],
-            width=40.0 / 100,
+            width=0.4 if len(self.data[sub]) <= 12 else 0.6,
             align='center',
             alpha=0.44,
             color='r' if sub == 1 else 'b',
@@ -178,6 +180,12 @@ class cablePlot():
         self.axes[sub].set_ybound(
             lower=min(self.data[sub])*0.7 if sub == 1 else min(self.data[sub])*0.95,
             upper=max(self.data[sub])*1.1 if sub == 1 else max(self.data[sub])*1.01)
+
+        for i in range(len(self.data[sub])):
+            self.axes[sub].text(
+                x=i-0.4 if len(self.data[sub]) <= 12 else i-0.6,
+                y=self.data[sub][i]*1.003 if sub == 0 else self.data[sub][i]*1.04,
+                s='%6.2f' % self.data[sub][i] if len(self.data[sub]) <= 12 else '%6.0f' % self.data[sub][i])
 
     def ChChoose(self, stat):
 
@@ -217,7 +225,8 @@ class cablePlot():
         self.canvas.draw()
 
 
-class cableReceiveThread(threading.Thread):
+class CableReceiveThread(threading.Thread):
+
     """Receive cable data
 
     self.data is a data buff which contains 48 at most
