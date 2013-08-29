@@ -84,7 +84,7 @@ class StrainFrame(wx.Frame):
     def Change(self, event):
         a = random.random() * 10
         for text in self.texts:
-            text.SetValue(str(a))
+            text.SetValue(str(a)[:7])
 
     def __del__(self):
         self.ChangeStat('Strain')
