@@ -2,6 +2,7 @@
 
 import wx
 import random
+from pyFBGA import PyFBGA
 
 
 class StrainFrame(wx.Frame):
@@ -15,7 +16,7 @@ class StrainFrame(wx.Frame):
         :param parent:
         :param id:
         """
-        wx.Frame.__init__(self, parent, id, u'光栅光纤实时监控', size=(1083, 720))
+        wx.Frame.__init__(self, parent, id, u'光栅光纤实时监控', size=(1600, 720))
         self.ChangeStat = stat
         panel = wx.Panel(self, -1, style=wx.TAB_TRAVERSAL
                          | wx.CLIP_CHILDREN
@@ -46,6 +47,9 @@ class StrainFrame(wx.Frame):
         panel.SetSizerAndFit(box)
         self.SetClientSize((panel.GetSize()[0] + 10, panel.GetSize()[1] + 10))
 
+        self.server = PyFBGA('FBGA_DR.dll', '172.22.49.143', 9100, 60)
+        self.server.connect()
+
     def DisplayTitle(self, title, gbs):
         """Display Title
         """
@@ -70,7 +74,7 @@ class StrainFrame(wx.Frame):
                         (chs['ch' + str(i)].index(j) + 2, (i - 1) * 2),
                         flag=wx.ALIGN_CENTER)
                 self.texts.append(
-                    wx.TextCtrl(panel, -1, "0.000", size=(50, -1)))
+                    wx.TextCtrl(panel, -1, "0.000", size=(70, -1)))
                 gbs.Add(self.texts[-1], (chs['ch' + str(i)]
                         .index(j) + 2, 2 * i - 1), flag=wx.ALIGN_CENTER)
 
@@ -82,15 +86,19 @@ class StrainFrame(wx.Frame):
                         (chs['ch' + str(i)].index(j) + 2 + 8, (i - 8 - 1) * 2),
                         flag=wx.ALIGN_CENTER)
                 self.texts.append(
-                    wx.TextCtrl(panel, -1, "0.000", size=(50, -1)))
+                    wx.TextCtrl(panel, -1, "0.000", size=(70, -1)))
                 gbs.Add(self.texts[-1], (chs['ch' + str(i)].index(j)
                         + 2 + 8, 2 * (i - 8) - 1), flag=wx.ALIGN_CENTER)
 
     def Change(self, event):
-        a = random.random() * 10
+        self.server.get_data()
+        self.server.trans_list()
+        count = 1
         for text in self.texts:
-            text.SetValue(str(a)[:7])
+            text.SetValue(str(self.server.lData[count][1]))
+            count += 1
 
     def __del__(self):
         self.ChangeStat('Strain')
         self.timer.Stop()
+        self.server.disconnect()
